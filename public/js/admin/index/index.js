@@ -31,10 +31,52 @@ $(function(){
 		    }
 		});
 	});*/
+	home.loadhomepiclist()
 	$("#collectionlist").click(function(){
 		admin.loadcollectionlist()
 	})
 })
+
+/*home*/
+var home={
+	loadhomepiclist:function(){
+		$.ajax({
+			url:"/loadhomepiclist",
+			data:{
+
+			},
+			success:function(h){
+				$(".content-wrapper").html(h)
+				home.bindhomepiclist()
+			}
+		})
+	},
+	bindhomepiclist:function(){
+		$("#addimage").click(function(){
+			home.loadaddhomepic()
+		})
+	},
+	loadaddhomepic:function(){
+		$.ajax({
+			url:"/loadaddhomepic",
+			data:{
+
+			},
+			success:function(h){
+				$(".content-wrapper").html(h)
+				home.bindaddhomepic()
+			}
+		})
+	},
+	bindaddhomepic:function(){
+		$(".addhomepic_close").click(function(){
+			$("#homepic_add").remove()
+			home.loadhomepiclist()
+		})
+	}
+}
+
+
 
 var admin={
 	loadcollectionlist:function(){

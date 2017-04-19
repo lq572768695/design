@@ -98,12 +98,22 @@ router.get('/login', function(req, res, next) {
 	    });
     });
 });
+
+
 /*退出*/
 router.get('/admincancel', function(req, res, next) {
 	delete req.session["loginAdmin"];
 	res.json({
 		code:0
 	})
+});
+/*homepic*/
+router.get('/loadhomepiclist', function(req, res, next) {
+  res.render('admin/homepiclist', {});
+});
+/*addhomepic*/
+router.get('/loadaddhomepic', function(req, res, next) {
+  res.render('admin/addhomepic', {});
 });
 /*上传文件*/
 router.post('/imgupload', function(req, res, next) {

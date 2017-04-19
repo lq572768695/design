@@ -23,4 +23,12 @@ router.get('/loadindexblog', function(req, res, next) {
 router.get('/loadindexcontact', function(req, res, next) {
   res.render('index/contact', {});
 });
+/*portfolioone*/
+router.get('/loadindexportfolioone', function(req, res, next) {
+  res.render('index/portfolioone', {});
+});
+/*portfoliootwo*/
+router.get('/loadindexportfoliotwo', function(req, res, next) {
+  res.render('index/portfoliotwo', {});
+});
 module.exports = router;

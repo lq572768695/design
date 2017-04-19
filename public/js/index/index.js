@@ -1,4 +1,4 @@
-var pageTimer = {} ; //定义计算器全局变量
+var pageTimer = {} ; //定义计时器全局变量
 $(function(){
 	index.loadhome()
 	$("#loadhome").click(function(){
@@ -20,6 +20,16 @@ $(function(){
 		$(".top_nav").removeClass("selected")
 		$(this).addClass("selected")
 		index.loadcontact()
+	})
+	$("#loadportfolio_one").click(function(){
+		$(".top_nav").removeClass("selected")
+		$(".my_portfolio").addClass("selected")
+		index.loadportfolioone()
+	})
+	$("#loadportfolio_two").click(function(){
+		$(".top_nav").removeClass("selected")
+		$(".my_portfolio").addClass("selected")
+		index.loadportfoliotwo()
 	})
 })
 
@@ -83,6 +93,36 @@ var index={
 	},
 	bindcontact:function(){
 
+	},
+	loadportfolioone:function(){
+		$.ajax({
+			url:"/loadindexportfolioone",
+			data:{
+
+			},
+			success:function(h){
+				$("#site_content").html(h)
+				index.bindportfolioone()
+			}
+		})
+	},
+	bindportfolioone:function(){
+
+	},
+	loadportfoliotwo:function(){
+		$.ajax({
+			url:"/loadindexportfoliotwo",
+			data:{
+
+			},
+			success:function(h){
+				$("#site_content").html(h)
+				index.bindportfoliotwo()
+			}
+		})
+	},
+	bindportfoliotwo:function(){
+		
 	}
 }
 

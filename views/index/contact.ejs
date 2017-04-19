@@ -1,0 +1,28 @@
+<div id="left_content">
+  <h1>Contact</h1>
+  <p>Say hello, using this contact form.</p>
+
+
+  <p style="color: red;">You must set-up a valid (to) email address before this contact page will work.</p>
+
+  <p style="color: red;">Please enter your name, a valid email address, your message and the answer to the simple maths question before sending your message.</p>
+  <form id="contact" action="" method="post">
+    <div class="form_settings">
+      <p><span>Name</span><input class="contact" type="text" name="your_name" value="" /></p>
+      <p><span>Email Address</span><input class="contact" type="text" name="your_email" value="" /></p>
+      <p><span>Message</span><textarea class="contact textarea" rows="5" cols="50" name="your_message"></textarea></p>
+      <p style="line-height: 1.7em;">To help prevent spam, please enter the answer to this question:</p>
+      <p><span></span><input type="text" name="user_answer" /><input type="hidden" name="answer" value="" /></p>
+      <p style="padding-top: 15px"><span>&nbsp;</span><input style="text-align:center;" class="submit"  name="" value="send" /></p>
+    </div>
+  </form>
+</div>
+<div id="right_content">
+  <img src="images/index/contact.jpg" width="450" height="450" title="contact" alt="contact" />
+</div>
+<script type="text/javascript" >
+  //全部清除方法
+  for(var each in pageTimer){
+      clearInterval(pageTimer[each]);
+  }
+</script>

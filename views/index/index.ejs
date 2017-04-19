@@ -22,49 +22,36 @@
       <div id="logo"><h1>PHOTO<a href="#">ART</a>WORK 2_reverse</h1></div>
       <nav>
         <ul class="sf-menu" id="nav">
-          <li class="selected"><a href="#">home</a></li>
-          <li><a href="#">about me</a></li>
-          <li><a href="#">my portfolio</a>
-            <ul>
-              <li><a href="#">portfolio_one</a></li>
-              <li><a href="#">portfolio_two</a></li>
+          <li id="loadhome" class="top_nav selected"><a href="#" >home</a></li>
+          <li id="loadaboutme" class="top_nav"><a href="#">about me</a></li>
+          <li class="top_nav"><a href="#">my portfolio</a>
+            <ul style="z-index:999">
+              <li id="loadportfolio_one"><a href="#">portfolio_one</a></li>
+              <li id="loadportfolio_two"><a href="#">portfolio_two</a></li>
             </ul>
           </li>
-          <li><a href="#">blog</a></li>
-          <li><a href="#">contact</a></li>
+          <li id="loadblog" class="top_nav"><a href="#">blog</a></li>
+          <li id="loadcontact" class="top_nav"><a href="#">contact</a></li>
         </ul>
       </nav>
     </header>
     <!-- end header -->
-	<div class="inner_copyright">Collect from <a href="http://www.cssmoban.com/" target="_blank" title="模板之家">模板之家</a></div>
     <!-- begin content -->
     <div id="site_content">
-      <ul class="slideshow">
-        <li class="show"><img width="950" height="450" src="images/index/home_1.jpg" alt="&quot;You can put a caption for your image right here&quot;" /></li>
-        <li><img width="950" height="450" src="images/index/home_2.jpg" alt="&quot;You can put a description of the image here if you like, or anything else if you want.&quot;" /></li>
-        <li><img width="950" height="450" src="images/index/home_3.jpg" alt="&quot;You can put a description of the image here if you like, or anything else if you want.&quot;" /></li>
-      </ul>
+      
     </div>
     <!-- end content -->
-
     <!-- begin footer -->
     <footer>
       <p>Copyright &copy; 2012 PhotoArtWork2_reverse. All Rights Reserved. <a href="http://www.cssmoban.com">网页模板</a>.</p>
       <p><img src="images/index/twitter.png" alt="twitter" />&nbsp;<img src="images/index/facebook.png" alt="facebook" />&nbsp;<img src="images/index/rss.png" alt="rss" /></p>
     </footer>
     <!-- end footer -->
-
   </div>
   <!-- javascript at the bottom for fast page loading -->
   <script src="js/common/jquery-2.2.3.min.js"></script>
   <script type="text/javascript" src="js/index/jquery.easing-sooper.js"></script>
-  <script type="text/javascript" src="js/index/jquery.sooperfish.js"></script>
-  <script type="text/javascript" src="js/index/image_fade.js"></script>
+  <script type="text/javascript" src="js/index/index.js"></script>
   <!-- initialise sooperfish menu -->
-  <script type="text/javascript">
-    $(document).ready(function() {
-      $('ul.sf-menu').sooperfish();
-    });
-  </script>
 </body>
 </html>

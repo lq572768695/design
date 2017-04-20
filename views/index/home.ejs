@@ -1,12 +1,19 @@
+
 <ul class="slideshow">
-	<li class="show"><img width="950" height="450" src="images/index/home_1.jpg" alt="&quot;You can put a caption for your image right here&quot;" /></li>
-	<li><img width="950" height="450" src="images/index/home_2.jpg" alt="&quot;You can put a description of the image here if you like, or anything else if you want.&quot;" /></li>
-	<li><img width="950" height="450" src="images/index/home_3.jpg" alt="&quot;You can put a description of the image here if you like, or anything else if you want.&quot;" /></li>
+	<% homepiclist.forEach(function(homepic,n){ %>
+		<% if(n==0){%>
+			<li class="show slideshow_li"><img width="950" height="450" src="<%=homepic.imgpath%>" alt="&quot;<%=homepic.imgdescribe%>&quot;" /></li>
+		<% }else{ %>
+			<li class="slideshow_li"><img width="950" height="450" src="<%=homepic.imgpath%>" alt="&quot;<%=homepic.imgdescribe%>&quot;" /></li>
+		<% } %>
+	<% }) %>
 </ul>
 <script type="text/javascript" >
 	//全部清除方法
 	for(var each in pageTimer){
 	    clearInterval(pageTimer[each]);
 	}
-	slideShow(4000)
+	if($(".slideshow_li").length>0){
+		slideShow(4000)
+	}
 </script>

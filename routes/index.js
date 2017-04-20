@@ -9,7 +9,17 @@ router.get('/', function(req, res, next) {
 });
 /*home*/
 router.get('/loadindexhome', function(req, res, next) {
-  res.render('index/home', {});
+	db.open(function (err,db) {
+	    db.collection("homepic", function (err,collection) {
+            collection.find().sort({imgmtime:-1}).toArray(function(err,homepiclist){
+	    		db.close();
+	    		res.render('index/home', {
+	    			homepiclist:homepiclist||[]
+	    		});
+	        });
+	    });
+    });
+  //res.render('index/home', {});
 });
 /*about me*/
 router.get('/loadindexaboutme', function(req, res, next) {

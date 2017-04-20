@@ -36,11 +36,12 @@ router.get('/loadlogin', function(req, res, next) {
 router.get('/regist', function(req, res, next) {
     var name=req.query["name"]
     var password=req.query["password"]
+    var id=createId()
     db.open(function (err,db) {
 	    db.collection("admin", function (err,collection) {
 	    	collection.find({name:name}).toArray(function(err,admin){
 	    		if(admin.length==0){
-	    			collection.insert({name:name,password:password}, function (err,docs) {
+	    			collection.insert({name:name,password:password,id:id}, function (err,docs) {
 		                console.log(docs);
 		                res.json({
 		                	code:0,
@@ -54,7 +55,7 @@ router.get('/regist', function(req, res, next) {
 							message : "该用户名已经被注册"
 						})
 		    		}else{
-		    			collection.insert({name:name,password:password}, function (err,docs) {
+		    			collection.insert({name:name,password:password,id:id}, function (err,docs) {
 			                console.log(docs);
 			                res.json({
 			                	code:0,
@@ -83,7 +84,6 @@ router.get('/login', function(req, res, next) {
 	    		}else{
 	    			if(admin[0].password==password){
 	    				req.session["loginAdmin"] = admin[0]
-	    				console.log(req.session["loginAdmin"])
 		    			res.json({
 		    				code:0,
 							message : "登陆成功"
@@ -156,13 +156,13 @@ router.post('/homepicimgupload', function(req, res, next) {
    	var tdir=getTime(Date.now()+'');
    	if(!fs.existsSync("public/upload/"+fdir+"/home"+"/"+tdir)){
    		fs.mkdirSync("public/upload/"+fdir+"/home"+"/"+tdir)
+   		fs.mkdirSync("/public/upload/"+fdir+"/home"+"/"+tdir)
    	}
    	var dirname="public/upload/"+fdir+"/"+"home"+"/"+tdir;
-	form.uploadDir = "/"+dirname;
+	form.uploadDir =dirname;
 	form.on('field', function(field, value) {
 	    fields.push([field, value]);
 	}).on('file', function(field, file) { 
-
 	    //console.log(field, file);  
 	    files.push([field, file]);   
 	    var types = file.name.split('.'); 
@@ -196,10 +196,11 @@ router.get('/savehomepic', function(req, res, next) {
     var imgpath=req.query["imgpath"]
     var imgsize=req.query["imgsize"]
     var imgmtime=req.query["imgmtime"]
+    var id=createId()
     db.open(function (err,db) {
 	    db.collection("homepic", function (err,collection) {
 	    	collection.find().toArray(function(err,homepic){
-    			collection.insert({imgname:imgname,imgdescribe:imgdescribe,imgpath:imgpath,imgsize:imgsize,imgmtime:imgmtime}, function (err,docs) {
+    			collection.insert({imgname:imgname,imgdescribe:imgdescribe,imgpath:imgpath,imgsize:imgsize,imgmtime:imgmtime,id:id}, function (err,docs) {
 	                console.log(docs);
 	                res.json({
 	                	code:0,
@@ -212,7 +213,21 @@ router.get('/savehomepic', function(req, res, next) {
     });
 });
 
-
+//deletehomepic
+router.get('/deletehomepic', function(req, res, next) {
+    var imgid=req.query["imgid"]
+    db.open(function (err,db) {
+	    db.collection("homepic", function (err,collection) {
+			collection.remove({id:imgid}, function (err,docs) {
+                res.json({
+                	code:0,
+					message : "删除成功"
+				})
+                db.close();
+            });
+	    });
+    });
+});
 function getTime(time){
     var date = new Date(parseInt(time));
     var year = date.getFullYear();
@@ -239,47 +254,12 @@ function getTime(time){
     return year+'-'+month+'-'+day;
 }
 
-/*上传文件*/
-router.post('/imgupload', function(req, res, next) {
-	var form = new formidable.IncomingForm(),files=[],fields=[],docs=[];  
-	console.log('start upload');  
-	//存放目录  
-	form.uploadDir = '/upload';  
-	form.on('field', function(field, value) {
-	    fields.push([field, value]);
 
-	}).on('file', function(field, file) {  
-	    //console.log(field, file);  
-	    files.push([field, file]); 
-	    docs.push(file);  
-	    var types = file.name.split('.');  
-	    var date = new Date();  
-	    var ms = Date.parse(date);
-
-
-	    fs.mkdir("upload" + '/fsDir', function (err) {
-		  if(err)
-		    throw err;
-		  console.log('创建目录成功')
-		})
-
-	    fs.renameSync(file.path, "upload/" + ms + '_'+file.name);  
-	}).on('end', function() {  
-	    console.log('-> upload done');  
-	    res.writeHead(200, {  
-	        'content-type': 'text/plain'  
-	    });  
-	    var out={Resopnse:{  
-		        'result-code':0,  
-		        timeStamp:new Date(),  
-		    },  
-		    files:docs  
-	    };  
-	    var sout=JSON.stringify(out); 
-	    res.end(sout);  
-	});  
-	form.parse(req, function(err, fields, files) {  
-	    err && console.log('formidabel error : ' + err);  
-	    console.log('parsing done');  
-	});
-});
+function createId(){
+	var endtime = 1440000000000;
+    var ntime = new Date().getTime();
+    ntime = ntime - endtime;
+    var rand = parseInt(Math.random() * 90)+10;
+    var code = parseInt(rand +"" + ntime);
+    return code.toString(36);
+}

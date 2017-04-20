@@ -13,6 +13,8 @@ $(function(){
 		})
 	})
 
+
+
 	home.loadhomepiclist()
 	$("#collectionlist").click(function(){
 		collection.loadcollectionlist()
@@ -42,6 +44,21 @@ var home={
 	bindhomepiclist:function(){
 		$("#addimage").click(function(){
 			home.loadaddhomepic()
+		})
+		$("#delete_homepic").click(function(){
+			var imgid=$(this).attr("imgid");
+			$.ajax({
+				url:"/deletehomepic",
+				data:{
+					imgid:imgid
+				},
+				success:function(rs){
+					$.tip(rs.message)
+					setTimeout(function(){
+						home.loadhomepiclist()
+					},1000)
+				}
+			})
 		})
 	},
 	loadaddhomepic:function(){

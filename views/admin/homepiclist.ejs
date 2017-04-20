@@ -11,16 +11,18 @@
     </div>
     <div class="box-footer">
       <ul class="mailbox-attachments clearfix">
-        <li>
-          <span class="mailbox-attachment-icon has-img"><img src="images/admin/photo1.png" alt="Attachment"></span>
-          <div class="mailbox-attachment-info">
-            <a href="#" class="mailbox-attachment-name"><i class="fa fa-camera"></i> photo1.png</a>
-            <span class="mailbox-attachment-size"  style="margin-top:5px;">
-              2.67 MB
-              <!-- <a href="#" class="btn btn-default btn-xs pull-right">3</a> -->
-            </span>
-          </div>
-        </li>
+        <% homepiclist.forEach(function(homepic){ %>
+          <li>
+            <span class="mailbox-attachment-icon has-img"><img src="<%=homepic.imgpath%>" alt="Attachment"></span>
+            <div class="mailbox-attachment-info">
+              <a href="#" class="mailbox-attachment-name"><i class="fa fa-camera"></i> <%=homepic.imgname%></a>
+              <span class="mailbox-attachment-size"  style="margin-top:5px;">
+                <%=homepic.imgsize%>
+                <!-- <a href="#" class="btn btn-default btn-xs pull-right">3</a> -->
+              </span>
+            </div>
+          </li>
+        <% }) %>
       </ul>
     </div>
   </div>

@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var mongo=require("mongodb");
 var fs=require("fs");
+var path = require("path")
 var formidable = require('formidable');
 var server=mongo.Server("localhost",27017,{auto_reconnect:true});
 var db=new mongo.Db("photo",server,{safe:true});
@@ -81,7 +82,8 @@ router.get('/login', function(req, res, next) {
 					})
 	    		}else{
 	    			if(admin[0].password==password){
-	    				req.session["loginAdmin"] = JSON.stringify(admin[0])
+	    				req.session["loginAdmin"] = admin[0]
+	    				console.log(req.session["loginAdmin"])
 		    			res.json({
 		    				code:0,
 							message : "登陆成功"
@@ -109,12 +111,134 @@ router.get('/admincancel', function(req, res, next) {
 });
 /*homepic*/
 router.get('/loadhomepiclist', function(req, res, next) {
-  res.render('admin/homepiclist', {});
+	db.open(function (err,db) {
+	    db.collection("homepic", function (err,collection) {
+            collection.find().sort({imgmtime:-1}).toArray(function(err,homepiclist){
+	    		db.close();
+	    		res.render('admin/homepiclist', {
+	    			homepiclist:homepiclist||[]
+	    		});
+	        });
+	    });
+    });
 });
 /*addhomepic*/
 router.get('/loadaddhomepic', function(req, res, next) {
   res.render('admin/addhomepic', {});
 });
+/*perinfor*/
+router.get('/loadaboutmeperinfor', function(req, res, next) {
+  res.render('admin/perinfor', {});
+});
+
+//相册列表
+router.get('/loadcollectionlist', function(req, res, next) {
+	res.render('admin/collectionlist', {});
+});
+  
+module.exports = router;
+
+/*上传文件*/
+router.post('/homepicimgupload', function(req, res, next) {
+	var form = new formidable.IncomingForm(),files=[],fields=[],docs=[];  
+	//console.log('start upload');  
+	//存放目录
+	
+	var date = new Date(); 
+    var ms = Date.parse(date);
+   	var fdir=req.session["loginAdmin"].name;
+   	if(!fs.existsSync("public/upload/"+fdir)){
+   		fs.mkdirSync("public/upload/"+fdir)
+   	}
+   	if(!fs.existsSync("public/upload/"+fdir+"/home")){
+   		fs.mkdirSync("public/upload/"+fdir+"/home")
+   	}
+   	var tdir=getTime(Date.now()+'');
+   	if(!fs.existsSync("public/upload/"+fdir+"/home"+"/"+tdir)){
+   		fs.mkdirSync("public/upload/"+fdir+"/home"+"/"+tdir)
+   	}
+   	var dirname="public/upload/"+fdir+"/"+"home"+"/"+tdir;
+	form.uploadDir = "/"+dirname;
+	form.on('field', function(field, value) {
+	    fields.push([field, value]);
+	}).on('file', function(field, file) { 
+
+	    //console.log(field, file);  
+	    files.push([field, file]);   
+	    var types = file.name.split('.'); 
+	    fs.renameSync(file.path, dirname+'/' + ms + '_'+file.name); 
+	    file.path="upload/"+fdir+"/"+"home"+"/"+tdir+'/' + ms + '_'+file.name 
+	    docs.push(file);
+	}).on('end', function() {  
+	    console.log('-> upload done');  
+	    res.writeHead(200, {  
+	        'content-type': 'text/plain'  
+	    });  
+	    var out={Resopnse:{  
+		        'result-code':0,  
+		        timeStamp:new Date(),  
+		    },  
+		    files:docs  
+	    };  
+	    var sout=JSON.stringify(out); 
+	    res.end(sout);  
+	});  
+	form.parse(req, function(err, fields, files) {  
+	    err && console.log('formidabel error : ' + err);  
+	    console.log('parsing done');  
+	});
+});
+
+//savehomepic
+router.get('/savehomepic', function(req, res, next) {
+    var imgname=req.query["imgname"]
+    var imgdescribe=req.query["imgdescribe"]
+    var imgpath=req.query["imgpath"]
+    var imgsize=req.query["imgsize"]
+    var imgmtime=req.query["imgmtime"]
+    db.open(function (err,db) {
+	    db.collection("homepic", function (err,collection) {
+	    	collection.find().toArray(function(err,homepic){
+    			collection.insert({imgname:imgname,imgdescribe:imgdescribe,imgpath:imgpath,imgsize:imgsize,imgmtime:imgmtime}, function (err,docs) {
+	                console.log(docs);
+	                res.json({
+	                	code:0,
+						message : "上传成功"
+					})
+	            });
+	    		db.close();
+	        });
+	    });
+    });
+});
+
+
+function getTime(time){
+    var date = new Date(parseInt(time));
+    var year = date.getFullYear();
+    var month = date.getMonth()+1;
+    if(month<10){
+        month='0'+month;
+    }
+    var day = date.getDate();
+    if(day<10){
+        day='0'+day;
+    }
+    /*var hour = date.getHours();
+    if(hour<10){
+        hour='0'+hour;
+    }
+    var minute = date.getMinutes();
+    if(minute<10){
+        minute='0'+minute;
+    }
+    var second = date.getSeconds();
+    if(second<10){
+        second='0'+second;
+    }*/
+    return year+'-'+month+'-'+day;
+}
+
 /*上传文件*/
 router.post('/imgupload', function(req, res, next) {
 	var form = new formidable.IncomingForm(),files=[],fields=[],docs=[];  
@@ -130,7 +254,15 @@ router.post('/imgupload', function(req, res, next) {
 	    docs.push(file);  
 	    var types = file.name.split('.');  
 	    var date = new Date();  
-	    var ms = Date.parse(date);  
+	    var ms = Date.parse(date);
+
+
+	    fs.mkdir("upload" + '/fsDir', function (err) {
+		  if(err)
+		    throw err;
+		  console.log('创建目录成功')
+		})
+
 	    fs.renameSync(file.path, "upload/" + ms + '_'+file.name);  
 	}).on('end', function() {  
 	    console.log('-> upload done');  
@@ -151,10 +283,3 @@ router.post('/imgupload', function(req, res, next) {
 	    console.log('parsing done');  
 	});
 });
-//相册列表
-router.get('/loadcollectionlist', function(req, res, next) {
-	res.render('admin/collectionlist', {});
-});
-  
-module.exports = router;
-

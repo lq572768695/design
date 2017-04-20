@@ -314,7 +314,7 @@
       <!-- sidebar menu: : style can be found in sidebar.less -->
       <ul class="sidebar-menu">
         <li class="header">MAIN NAVIGATION</li>
-        <li class="treeview">
+        <li class="treeview active">
           <a href="#">
             <i class="fa fa-dashboard"></i> <span>个人主页</span>
             <span class="pull-right-container">
@@ -322,7 +322,7 @@
             </span>
           </a>
           <ul class="treeview-menu">
-            <li class=""><a href="javascript:void(0)"><i class="fa fa-circle-o"></i> 图片管理</a></li>
+            <li class="" id="loadhomepiclist"><a href="javascript:void(0)"><i class="fa fa-circle-o"></i> 图片管理</a></li>
           </ul>
         </li>
         <li class="treeview">
@@ -333,7 +333,7 @@
             </span>
           </a>
           <ul class="treeview-menu">
-            <li class=""><a href="javascript:void(0)"><i class="fa fa-circle-o"></i> 个人信息</a></li>
+            <li class="" id="loadperinfor"><a href="javascript:void(0)"><i class="fa fa-circle-o"></i> 个人介绍</a></li>
           </ul>
         </li>
        	<li class="treeview">
@@ -387,7 +387,6 @@
 
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper" style="padding:10px 20px;">
-
     <!-- /.content -->
   </div>
   <!-- /.content-wrapper -->
@@ -597,6 +596,8 @@
 
 <!-- jQuery 2.2.3 -->
 <script src="js/common/jquery-2.2.3.min.js"></script>
+<!-- jQuery plugs -->
+<script src="js/common/jquery.plugs.js"></script>
 <!-- jQuery UI 1.11.4 -->
 <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
 <!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->

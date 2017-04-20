@@ -13,27 +13,15 @@ $(function(){
 		})
 	})
 
-	/*$("#img_upload").click(function(){
-	    var files = $('#avatar').prop('files');
-	    var data = new FormData();
-	    for(var i=0;i<files.length;i++){
-			data.append(files[i].name,files[i]);
-		}
-		$.ajax({
-		    url: '/admin/imgupload',
-		    type: 'post',
-		    data:data,
-		    cache: false,
-		    processData: false,
-		    contentType: false,
-		    success:function(rs){
-		    	console.log(rs)
-		    }
-		});
-	});*/
 	home.loadhomepiclist()
 	$("#collectionlist").click(function(){
-		admin.loadcollectionlist()
+		collection.loadcollectionlist()
+	})
+	$("#loadhomepiclist").click(function(){
+		home.loadhomepiclist()
+	})
+	$("#loadperinfor").click(function(){
+		aboutme.loadperinfor()
 	})
 })
 
@@ -73,12 +61,51 @@ var home={
 			$("#homepic_add").remove()
 			home.loadhomepiclist()
 		})
+		$("#image_save").click(function(){
+			var files = $('#homepic').prop('files');
+		    var imgdata = new FormData();
+		    for(var i=0;i<files.length;i++){
+				imgdata.append(files[i].name,files[i]);
+			}
+			$.ajax({
+			    url: '/homepicimgupload',
+			    type: 'post',
+			    data:imgdata,
+			    cache: false,
+			    processData: false,
+			    contentType: false,
+			    success:function(rs){
+			    	var imgname=$("input[name='imgname']").val();
+			    	var imgdescribe=$("input[name='imgdescribe']").val();
+			    	var imgpath=$.parseJSON(rs).files[0].path;
+			    	var imgmtime=$.parseJSON(rs).files[0].mtime;
+			    	var size=$.parseJSON(rs).files[0].size/1024/1024;
+		    		var imgsize =Math.round(size*100)/100+"MB";
+		    		$.ajax({
+						url : "/savehomepic",
+						type : "get",
+						data : {
+							imgname:imgname,
+							imgdescribe:imgdescribe,
+							imgpath:imgpath,
+							imgsize:imgsize,
+							imgmtime:imgmtime
+						},
+						success : function(rs){
+							$.tip(rs.message)
+							setTimeout(function(){
+								home.loadhomepiclist()
+							},1000)
+						}
+					})
+			    }
+			}); 
+		})
 	}
 }
 
-
-
-var admin={
+/*相册*/
+var collection={
 	loadcollectionlist:function(){
 		$.ajax({
 			url:"/loadcollectionlist",
@@ -87,7 +114,7 @@ var admin={
 			},
 			success:function(h){
 				$(".content-wrapper").html(h)
-				admin.bindcollectionlist()
+				collection.bindcollectionlist()
 			}
 		})
 	},
@@ -95,3 +122,21 @@ var admin={
 	}
 }
 
+/*about me*/
+var aboutme={
+	loadperinfor:function(){
+		$.ajax({
+			url:"/loadaboutmeperinfor",
+			data:{
+
+			},
+			success:function(h){
+				$(".content-wrapper").html(h)
+				aboutme.bindperinfor()
+			}
+		})
+	},
+	bindperinfor:function(){
+
+	}
+}

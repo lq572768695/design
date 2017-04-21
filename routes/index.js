@@ -23,7 +23,18 @@ router.get('/loadindexhome', function(req, res, next) {
 });
 /*about me*/
 router.get('/loadindexaboutme', function(req, res, next) {
-  res.render('index/aboutme', {});
+  var id=req.session["loginAdmin"].id
+  db.open(function (err,db) {
+      db.collection("perinfor", function (err,collection) {
+            collection.find().toArray(function(err,perinfor){
+          db.close();
+          res.render('index/aboutme', {
+            perinfor:perinfor[0]||{}
+          });
+          });
+      });
+    });
+ // res.render('index/aboutme', {});
 });
 /*blog*/
 router.get('/loadindexblog', function(req, res, next) {

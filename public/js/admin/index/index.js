@@ -154,6 +154,42 @@ var aboutme={
 		})
 	},
 	bindperinfor:function(){
-
+		$("#aboutme_save").click(function(){
+			var imgpath=$("#perinfor_src").attr("src")
+			var perdescribe=$("#perdescribe").val()
+			$.ajax({
+				url : "/saveperinfor",
+				type : "get",
+				data : {
+					imgpath:imgpath,
+					perdescribe:perdescribe
+				},
+				success : function(rs){
+					$.tip(rs.message)
+					setTimeout(function(){
+						aboutme.loadperinfor()
+					},1000)
+				}
+			})
+		})
+		$("#update_img_save").click(function(){
+			var files = $('#update_img').prop('files');
+		    var imgdata = new FormData();
+		    for(var i=0;i<files.length;i++){
+				imgdata.append(files[i].name,files[i]);
+			}
+			$.ajax({
+			    url: '/perinforpicimgupload',
+			    type: 'post',
+			    data:imgdata,
+			    cache: false,
+			    processData: false,
+			    contentType: false,
+			    success:function(rs){
+			    	var imgpath=$.parseJSON(rs).files[0].path;
+			    	$("#perinfor_src").attr("src",imgpath)
+			    }
+			}); 
+		})
 	}
 }

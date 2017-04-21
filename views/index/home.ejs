@@ -2,9 +2,9 @@
 <ul class="slideshow">
 	<% homepiclist.forEach(function(homepic,n){ %>
 		<% if(n==0){%>
-			<li class="show slideshow_li"><img width="950" height="450" src="<%=homepic.imgpath%>" alt="&quot;<%=homepic.imgdescribe%>&quot;" /></li>
+			<li class="show slideshow_li"><img width="950" height="450" src="<%=homepic.path%>" alt="&quot;<%=homepic.describe%>&quot;" /></li>
 		<% }else{ %>
-			<li class="slideshow_li"><img width="950" height="450" src="<%=homepic.imgpath%>" alt="&quot;<%=homepic.imgdescribe%>&quot;" /></li>
+			<li class="slideshow_li"><img width="950" height="450" src="<%=homepic.path%>" alt="&quot;<%=homepic.describe%>&quot;" /></li>
 		<% } %>
 	<% }) %>
 </ul>

@@ -35,7 +35,43 @@ npm install
   数据库：mongodb数据库（之所以选择这个数据库，是因为mongodb可以直接保存JS对象成数据库的文档，json、js原生支持，原生解析mangodb的数据，这也保证了从前端到后端再到数据库的语言一致）
 	
 	1、集合（表）
-	暂无
+	//用户
+	user:{
+		name:name,
+		password:password,
+		id:id,
+		ctime:ctime,
+		photo:photo,
+		introduce:introduce
+	}
+	//相册
+	photos{
+		name:name,
+		id:id,
+		cover:cover,
+		from:from,
+		num:num
+	}
+	//主页图片
+	homepic:{
+		name:name,
+		size:size,
+		path:path,
+		from:from,
+		describe:describe,
+		id:id,
+		ctime:ctime
+	}
+	//图片
+	picture:{
+		name:name,
+		size:size,
+		path:path,
+		photoid:photoid,
+		describe:describe,
+		id:id,
+		ctime:ctime
+	}
 	
   
   2、客户端：

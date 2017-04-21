@@ -7,14 +7,13 @@
         <div class="box-header with-border">
           <div class="user-block">
             <img class="img-circle" src="images/index/about.jpg" alt="User Image">
-            <span class="username"><a href="#">Jonathan Burke Jr.</a></span>
-            <span class="description">Shared publicly - 7:30 PM Today</span>
+            <span class="username"><a href="#"><%=user.name%></a></span>
           </div>
         </div>
         <!-- /.box-header -->
         <div class="box-body">
           <textarea id="perdescribe" style="width:100%;height:495px;resize:none;">
-            <%=perinfor.perdescribe%>
+            <%=user.describe%>
           </textarea>
         <!-- /.box-footer -->
       </div>
@@ -27,17 +26,16 @@
       <div class="box-header with-border">
         <div class="user-block">
           <img class="img-circle" src="images/index/about.jpg" alt="User Image">
-          <span class="username"><a href="#">Jonathan Burke Jr.</a></span>
-          <span class="description">Shared publicly - 7:30 PM Today</span>
+          <span class="username"><a href="#"><%=user.name%></a></span>
         </div>
       </div>
       <!-- /.box-header -->
       <div class="box-body">
-        <img id="perinfor_src" class="img-responsive pad" src="<%=perinfor.imgpath%>" alt="Photo">
+        <img id="perinfor_src" class="img-responsive pad" src="<%=user.photo%>" alt="Photo">
 
-        <p>I took this photo this morning. What do you guys think?</p>
+        <p>你可以通过下面的按钮上传或替换你的照片</p>
         <form >
-          <input type="file" name="files" value="更换图片" accept="image/*" id="update_img">
+          <input type="file" name="files" value="" accept="image/*" id="update_img">
           <button type="button" class="btn btn-primary" id="update_img_save" style="float:right;position:relative;top:-22px;height:25px;line-height:10px;">更换</button>
         </form>
       </div>
@@ -45,8 +43,8 @@
     <!-- /.box -->
   </div>
   <!-- /. box -->
-  <div class="modal-footer">
-    <button type="button" class="btn btn-primary" id="aboutme_save">保存</button>
+  <div class="modal-footer" >
+    <button type="button"  class="btn btn-primary" id="aboutme_save">保存个人信息</button>
   </div>
 </div>
 <!-- /.col -->

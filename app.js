@@ -29,7 +29,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieSession({
   name: 'session',
   keys: ['liqiang', 'qiangli'],
-  maxAge: 10 * 60 * 1000
+  maxAge: 100 * 60 * 1000
 }))
 app.use('/', index);
 app.use('/', admin);

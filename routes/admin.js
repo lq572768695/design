@@ -8,15 +8,15 @@ var server=mongo.Server("localhost",27017,{auto_reconnect:true});
 var db=new mongo.Db("photo",server,{safe:true});
 /*后台管理*/
 router.get('/admin', function(req, res, next) {
-	var loginAdmin = req.session["loginAdmin"]
+	var loginUser = req.session["loginUser"]
 	db.open(function (err,db) {
-	    db.collection("admin", function (err,collection) {
-	    	collection.find({}).toArray(function(err,admin){
-	    		if(admin.length==0){
+	    db.collection("user", function (err,collection) {
+	    	collection.find({}).toArray(function(err,user){
+	    		if(user.length==0){
 	    			res.render('admin/regist', {});
-	    		}else if(admin.length!=0 && !loginAdmin){
+	    		}else if(user.length!=0 && !loginUser){
 	    			res.render('admin/login', {});
-	    		}else if(admin.length!=0 && loginAdmin){
+	    		}else if(user.length!=0 && loginUser){
 	    			res.render('admin/index', {});
 	    		}
 	    		db.close();
@@ -37,11 +37,12 @@ router.get('/regist', function(req, res, next) {
     var name=req.query["name"]
     var password=req.query["password"]
     var id=createId()
+    var ctime = new Date()
     db.open(function (err,db) {
-	    db.collection("admin", function (err,collection) {
-	    	collection.find({name:name}).toArray(function(err,admin){
-	    		if(admin.length==0){
-	    			collection.insert({name:name,password:password,id:id}, function (err,docs) {
+	    db.collection("user", function (err,collection) {
+	    	collection.find({name:name}).toArray(function(err,user){
+	    		if(user.length==0){
+	    			collection.insert({name:name,password:password,id:id,ctime:ctime}, function (err,docs) {
 		                console.log(docs);
 		                res.json({
 		                	code:0,
@@ -49,13 +50,13 @@ router.get('/regist', function(req, res, next) {
 						})
 		            });
 	    		}else{
-	    			if(admin[0].name==name){
+	    			if(user[0].name==name){
 		    			res.json({
 		    				code:1,
 							message : "该用户名已经被注册"
 						})
 		    		}else{
-		    			collection.insert({name:name,password:password,id:id}, function (err,docs) {
+		    			collection.insert({name:name,password:password,id:id,ctime:ctime}, function (err,docs) {
 			                console.log(docs);
 			                res.json({
 			                	code:0,
@@ -74,16 +75,16 @@ router.get('/login', function(req, res, next) {
     var name=req.query["name"]
     var password=req.query["password"]
     db.open(function (err,db) {
-	    db.collection("admin", function (err,collection) {
-            collection.find({name:name}).toArray(function(err,admin){
-	    		if(admin.length==0){
+	    db.collection("user", function (err,collection) {
+            collection.find({name:name}).toArray(function(err,user){
+	    		if(user.length==0){
 	                res.json({
 	                	code:1,
 						message : "该用户名不存在"
 					})
 	    		}else{
-	    			if(admin[0].password==password){
-	    				req.session["loginAdmin"] = admin[0]
+	    			if(user[0].password==password){
+	    				req.session["loginUser"] = user[0]
 		    			res.json({
 		    				code:0,
 							message : "登陆成功"
@@ -100,21 +101,19 @@ router.get('/login', function(req, res, next) {
 	    });
     });
 });
-
-
 /*退出*/
 router.get('/admincancel', function(req, res, next) {
-	delete req.session["loginAdmin"];
+	delete req.session["loginUser"];
 	res.json({
 		code:0
 	})
 });
-/*homepic*/
+/*主页图片列表*/
 router.get('/loadhomepiclist', function(req, res, next) {
-	var id=req.session["loginAdmin"].id
+	var id=req.session["loginUser"].id
 	db.open(function (err,db) {
 	    db.collection("homepic", function (err,collection) {
-            collection.find({from:id}).sort({imgmtime:-1}).toArray(function(err,homepiclist){
+            collection.find({from:id}).sort({ctime:-1}).toArray(function(err,homepiclist){
 	    		db.close();
 	    		res.render('admin/homepiclist', {
 	    			homepiclist:homepiclist||[]
@@ -123,42 +122,17 @@ router.get('/loadhomepiclist', function(req, res, next) {
 	    });
     });
 });
-/*addhomepic*/
+/*添加个人主页的图片*/
 router.get('/loadaddhomepic', function(req, res, next) {
   res.render('admin/addhomepic', {});
 });
-/*perinfor*/
-router.get('/loadaboutmeperinfor', function(req, res, next) {
-	var id=req.session["loginAdmin"].id
-	db.open(function (err,db) {
-	    db.collection("perinfor", function (err,collection) {
-            collection.find({from:id}).sort({imgmtime:-1}).toArray(function(err,perinfor){
-	    		db.close();
-	    		res.render('admin/perinfor', {
-	    			perinfor:perinfor[0]||{}
-	    		});
-	        });
-	    });
-    });
-  //res.render('admin/perinfor', {});
-});
-
-//相册列表
-router.get('/loadcollectionlist', function(req, res, next) {
-	res.render('admin/collectionlist', {});
-});
-  
-module.exports = router;
-
-/*上传文件*/
+/*上传个人主页的图片*/
 router.post('/homepicimgupload', function(req, res, next) {
 	var form = new formidable.IncomingForm(),files=[],fields=[],docs=[];  
 	//console.log('start upload');  
-	//存放目录
-	
 	var date = new Date(); 
-    var ms = Date.parse(date);
-   	var fdir=req.session["loginAdmin"].name;
+    var ms = createId();
+   	var fdir=req.session["loginUser"].id;
    	if(!fs.existsSync("public/upload/"+fdir)){
    		fs.mkdirSync("public/upload/"+fdir)
    	}
@@ -168,7 +142,6 @@ router.post('/homepicimgupload', function(req, res, next) {
    	var tdir=getTime(Date.now()+'');
    	if(!fs.existsSync("public/upload/"+fdir+"/home"+"/"+tdir)){
    		fs.mkdirSync("public/upload/"+fdir+"/home"+"/"+tdir)
-   		fs.mkdirSync("/public/upload/"+fdir+"/home"+"/"+tdir)
    	}
    	var dirname="public/upload/"+fdir+"/"+"home"+"/"+tdir;
 	form.uploadDir =dirname;
@@ -200,34 +173,29 @@ router.post('/homepicimgupload', function(req, res, next) {
 	    console.log('parsing done');  
 	});
 });
-
-//savehomepic
+//保存个人主页的图片
 router.get('/savehomepic', function(req, res, next) {
-
-    var imgname=req.query["imgname"]
-    var imgdescribe=req.query["imgdescribe"]
-    var imgpath=req.query["imgpath"]
-    var imgsize=req.query["imgsize"]
-    var imgmtime=req.query["imgmtime"]
+    var name=req.query["imgname"]
+    var describe=req.query["imgdescribe"]
+    var path=req.query["imgpath"]
+    var size=req.query["imgsize"]
+    var ctime=req.query["imgmtime"]
     var id=createId()
-    var from=req.session["loginAdmin"].id;
+    var from=req.session["loginUser"].id;
     db.open(function (err,db) {
 	    db.collection("homepic", function (err,collection) {
-	    	collection.find().toArray(function(err,homepic){
-    			collection.insert({imgname:imgname,imgdescribe:imgdescribe,imgpath:imgpath,imgsize:imgsize,imgmtime:imgmtime,id:id,from:from}, function (err,docs) {
-	                console.log(docs);
-	                res.json({
-	                	code:0,
-						message : "上传成功"
-					})
-	            });
-	    		db.close();
-	        });
+			collection.insert({name:name,describe:describe,path:path,size:size,ctime:ctime,id:id,from:from}, function (err,docs) {
+                console.log(docs);
+                res.json({
+                	code:0,
+					message : "上传成功"
+				})
+				db.close();
+            });
 	    });
     });
 });
-
-//deletehomepic
+/*删除个人主页的图片*/
 router.get('/deletehomepic', function(req, res, next) {
     var imgid=req.query["imgid"]
     db.open(function (err,db) {
@@ -242,28 +210,39 @@ router.get('/deletehomepic', function(req, res, next) {
 	    });
     });
 });
-
-/*上传文件*/
-router.post('/perinforpicimgupload', function(req, res, next) {
+/*个人介绍*/
+router.get('/loadaboutmeintroduce', function(req, res, next) {
+	var id=req.session["loginUser"].id
+	db.open(function (err,db) {
+	    db.collection("user", function (err,collection) {
+            collection.find({id:id}).toArray(function(err,user){
+	    		db.close();
+	    		res.render('admin/introduce', {
+	    			user:user[0]||{}
+	    		});
+	        });
+	    });
+    });
+  //res.render('admin/perinfor', {});
+});
+/*关于我的图片上传*/
+router.post('/aboutmeintroduceimgupload', function(req, res, next) {
 	var form = new formidable.IncomingForm(),files=[],fields=[],docs=[];  
 	//console.log('start upload');  
-	//存放目录
-	
 	var date = new Date(); 
-    var ms = Date.parse(date);
-   	var fdir=req.session["loginAdmin"].name;
+    var ms = createId();
+   	var fdir=req.session["loginUser"].id;
    	if(!fs.existsSync("public/upload/"+fdir)){
    		fs.mkdirSync("public/upload/"+fdir)
    	}
-   	if(!fs.existsSync("public/upload/"+fdir+"/perinfor")){
-   		fs.mkdirSync("public/upload/"+fdir+"/perinfor")
+   	if(!fs.existsSync("public/upload/"+fdir+"/aboutme")){
+   		fs.mkdirSync("public/upload/"+fdir+"/aboutme")
    	}
    	var tdir=getTime(Date.now()+'');
-   	if(!fs.existsSync("public/upload/"+fdir+"/perinfor"+"/"+tdir)){
-   		fs.mkdirSync("public/upload/"+fdir+"/perinfor"+"/"+tdir)
-   		fs.mkdirSync("/public/upload/"+fdir+"/perinfor"+"/"+tdir)
+   	if(!fs.existsSync("public/upload/"+fdir+"/aboutme"+"/"+tdir)){
+   		fs.mkdirSync("public/upload/"+fdir+"/aboutme"+"/"+tdir)
    	}
-   	var dirname="public/upload/"+fdir+"/"+"perinfor"+"/"+tdir;
+   	var dirname="public/upload/"+fdir+"/"+"aboutme"+"/"+tdir;
 	form.uploadDir =dirname;
 	form.on('field', function(field, value) {
 	    fields.push([field, value]);
@@ -272,7 +251,7 @@ router.post('/perinforpicimgupload', function(req, res, next) {
 	    files.push([field, file]);   
 	    var types = file.name.split('.'); 
 	    fs.renameSync(file.path, dirname+'/' + ms + '_'+file.name); 
-	    file.path="upload/"+fdir+"/"+"perinfor"+"/"+tdir+'/' + ms + '_'+file.name 
+	    file.path="upload/"+fdir+"/"+"aboutme"+"/"+tdir+'/' + ms + '_'+file.name 
 	    docs.push(file);
 	}).on('end', function() {  
 	    console.log('-> upload done');  
@@ -293,30 +272,169 @@ router.post('/perinforpicimgupload', function(req, res, next) {
 	    console.log('parsing done');  
 	});
 });
-
-router.get('/saveperinfor', function(req, res, next) {
-    var imgpath=req.query["imgpath"]
-    var perdescribe=req.query["perdescribe"]
-    var id=createId()
-    var from=req.session["loginAdmin"].id;
+/*保存关于我的个人信息*/
+router.get('/saveaboutmeintroduce', function(req, res, next) {
+    var photo=req.query["photo"]
+    var describe=req.query["describe"]
+    var id=req.session["loginUser"].id
     db.open(function (err,db) {
-	    db.collection("perinfor", function (err,collection) {
-	    	collection.find().toArray(function(err,perinfor){
-    			collection.insert({perdescribe:perdescribe,imgpath:imgpath,id:id,from:from}, function (err,docs) {
-	                console.log(docs);
-	                res.json({
-	                	code:0,
-						message : "保存成功"
-					})
-	            });
+	    db.collection("user", function (err,collection) {
+			collection.update({id:id},{"$set":{describe:describe,photo:photo}}, function (err,docs) {
+				res.json({
+                	code:0,
+					message : "更新成功"
+				})
+                db.close();
+            });
+	    });
+    });
+});
+//相册列表
+router.get('/loadphotoslist', function(req, res, next) {
+	var id=req.session["loginUser"].id
+	db.open(function (err,db) {
+	    db.collection("photos", function (err,collection) {
+            collection.find({from:id}).sort({time:-1}).toArray(function(err,photoslist){
 	    		db.close();
+	    		res.render('admin/photoslist', {
+	    			photoslist:photoslist||[]
+	    		});
 	        });
 	    });
     });
 });
 
+//添加相册
+router.get('/loadaddphotos', function(req, res, next) {
+	res.render('admin/addphotos', {});
+});
+/*保存相册*/
+router.get('/savephotos', function(req, res, next) {
+	var name=req.query["name"]
+    var id=createId()
+    var from=req.session["loginUser"].id;
+    var path="images/admin/photo1.png" 
+    db.open(function (err,db) {
+	    db.collection("photos", function (err,collection) {
+			collection.insert({name:name,id:id,from:from,num:0,path:path}, function (err,docs) {
+                console.log(docs);
+                res.json({
+                	code:0,
+					message : "添加成功"
+				})
+            });
+    		db.close();
+	    });
+    });
+});
 
+/*相册详情*/
+router.get('/loadpicturelist', function(req, res, next) {
+	var photosid=req.query["photosid"]
+	db.open(function (err,db) {
+	    db.collection("picture", function (err,collection) {
+            collection.find({from:photosid}).sort({time:-1}).toArray(function(err,picturelist){
+	    		db.close();
+	    		res.render('admin/picturelist', {
+	    			picturelist:picturelist||[]
+	    		});
+	        });
+	    });
+    });
+});
 
+/*相册添加图片*/
+router.get('/loadaddpicture', function(req, res, next) {
+	res.render('admin/addpicture', {});
+});
+/*相册添加图片上传*/
+router.post('/pictureimgupload', function(req, res, next) {
+	var form = new formidable.IncomingForm(),files=[],fields=[],docs=[];  
+	//console.log('start upload');  
+	var date = new Date(); 
+    var ms = createId();
+   	var fdir=req.session["loginUser"].id;
+   	if(!fs.existsSync("public/upload/"+fdir)){
+   		fs.mkdirSync("public/upload/"+fdir)
+   	}
+   	if(!fs.existsSync("public/upload/"+fdir+"/photos")){
+   		fs.mkdirSync("public/upload/"+fdir+"/photos")
+   	}
+   	var tdir=getTime(Date.now()+'');
+   	if(!fs.existsSync("public/upload/"+fdir+"/photos"+"/"+tdir)){
+   		fs.mkdirSync("public/upload/"+fdir+"/photos"+"/"+tdir)
+   	}
+   	var dirname="public/upload/"+fdir+"/"+"photos"+"/"+tdir;
+	form.uploadDir =dirname;
+	form.on('field', function(field, value) {
+	    fields.push([field, value]);
+	}).on('file', function(field, file) { 
+	    //console.log(field, file);  
+	    files.push([field, file]);   
+	    var types = file.name.split('.'); 
+	    fs.renameSync(file.path, dirname+'/' + ms + '_'+file.name); 
+	    file.path="upload/"+fdir+"/"+"photos"+"/"+tdir+'/' + ms + '_'+file.name 
+	    docs.push(file);
+	}).on('end', function() {  
+	    console.log('-> upload done');  
+	    res.writeHead(200, {  
+	        'content-type': 'text/plain'  
+	    });  
+	    var out={Resopnse:{  
+		        'result-code':0,  
+		        timeStamp:new Date(),  
+		    },  
+		    files:docs  
+	    };  
+	    var sout=JSON.stringify(out); 
+	    res.end(sout);  
+	});  
+	form.parse(req, function(err, fields, files) {  
+	    err && console.log('formidabel error : ' + err);  
+	    console.log('parsing done');  
+	});
+});
+//保存相册的图片
+router.get('/savepicture', function(req, res, next) {
+	var obj=req.query["obj"]
+    var from=req.query["photosid"]
+    db.open(function (err,db) {
+	    db.collection("picture", function (err,collection) {
+    		for(var n=0;n<obj.length;n++){
+    			var path=obj[n].path;
+		    	var ctime=obj[n].mtime;
+		    	var imgsize=obj[n].size/1024/1024;
+	    		var size =Math.round(imgsize*100)/100+"MB";
+	    		var id=createId();
+    			collection.insert({path:path,size:size,ctime:ctime,id:id,from:from}, function (err,docs) {
+	                console.log(docs);
+	            });
+    		}
+            res.json({
+            	code:0,
+				message : "上传成功"
+			})
+			db.close()
+	    });
+    });
+});
+/*删除个人主页的图片*/
+router.get('/deletepicture', function(req, res, next) {
+    var imgid=req.query["imgid"]
+    db.open(function (err,db) {
+	    db.collection("picture", function (err,collection) {
+			collection.remove({id:imgid}, function (err,docs) {
+                res.json({
+                	code:0,
+					message : "删除成功"
+				})
+                db.close();
+            });
+	    });
+    });
+});
+
+module.exports = router;
 function getTime(time){
     var date = new Date(parseInt(time));
     var year = date.getFullYear();

@@ -11,27 +11,25 @@ router.get('/', function(req, res, next) {
 router.get('/loadindexhome', function(req, res, next) {
 	db.open(function (err,db) {
 	    db.collection("homepic", function (err,collection) {
-            collection.find().sort({imgmtime:-1}).toArray(function(err,homepiclist){
+        collection.find().sort({ctime:-1}).toArray(function(err,homepiclist){
 	    		db.close();
 	    		res.render('index/home', {
 	    			homepiclist:homepiclist||[]
 	    		});
-	        });
+	       });
 	    });
     });
-  //res.render('index/home', {});
 });
 /*about me*/
 router.get('/loadindexaboutme', function(req, res, next) {
-  var id=req.session["loginAdmin"].id
   db.open(function (err,db) {
-      db.collection("perinfor", function (err,collection) {
-            collection.find().toArray(function(err,perinfor){
+      db.collection("user", function (err,collection) {
+        collection.find().toArray(function(err,user){
           db.close();
           res.render('index/aboutme', {
-            perinfor:perinfor[0]||{}
+            user:user[0]||{}
           });
-          });
+        });
       });
     });
  // res.render('index/aboutme', {});

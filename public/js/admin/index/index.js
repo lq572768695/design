@@ -185,9 +185,10 @@ var photos={
 		$("#addphotos").click(function(){
 			photos.loadaddphotos()
 		})
-		$("#loadpicturelist").click(function(){
+		$(".loadpicturelist").click(function(){
 			var photosid=$(this).attr("photosid")
-			photos.loadpicturelist(photosid)
+			var photosname=$(this).attr("photosname")
+			photos.loadpicturelist(photosid,photosname)
 		})
 	},
 	loadaddphotos:function(){
@@ -223,7 +224,7 @@ var photos={
 			})
 		})
 	},
-	loadpicturelist:function(photosid){
+	loadpicturelist:function(photosid,photosname){
 		$.ajax({
 			url:"/loadpicturelist",
 			data:{
@@ -231,13 +232,14 @@ var photos={
 			},
 			success:function(h){
 				$(".content-wrapper").html(h)
-				photos.bindpicturelist(photosid)
+				$(".photosname").html("图片列表（"+photosname+"）")
+				photos.bindpicturelist(photosid,photosname)
 			}
 		})
 	},
-	bindpicturelist:function(photosid){
+	bindpicturelist:function(photosid,photosname){
 		$("#addimage").click(function(){
-			photos.loadaddpicture(photosid)
+			photos.loadaddpicture(photosid,photosname)
 		})
 		$("#delete_photospic").click(function(){
 			var imgid=$(this).attr("imgid");
@@ -249,23 +251,23 @@ var photos={
 				success:function(rs){
 					$.tip(rs.message)
 					setTimeout(function(){
-						photos.loadpicturelist(photosid)
+						photos.loadpicturelist(photosid,photosname)
 					},1000)
 				}
 			})
 		})
 	},
-	loadaddpicture:function(photosid){
+	loadaddpicture:function(photosid,photosname){
 		$.ajax({
 			url:"/loadaddpicture",
 			data:{},
 			success:function(h){
 				$("body").append(h)
-				photos.bindaddpicture(photosid)
+				photos.bindaddpicture(photosid,photosname)
 			}
 		})
 	},
-	bindaddpicture:function(photosid){
+	bindaddpicture:function(photosid,photosname){
 		$(".addpicture_close").click(function(){
 			$("#picture_add").remove()
 		})
@@ -294,7 +296,7 @@ var photos={
 							$.tip(re.message)
 							setTimeout(function(){
 								$("#picture_add").remove()
-								photos.loadpicturelist(photosid)
+								photos.loadpicturelist(photosid,photosname)
 							},1000)
 						}
 					})

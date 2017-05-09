@@ -150,9 +150,13 @@ router.post('/homepicimgupload', function(req, res, next) {
 	}).on('file', function(field, file) { 
 	    //console.log(field, file);  
 	    files.push([field, file]);   
-	    var types = file.name.split('.'); 
+	    //var types = file.name.split('.'); 
+	    if(file.name.slice(-3)!="jpg"&&file.name.slice(-3)!="png"){
+	    	file.name=".jpg"
+	    }
 	    fs.renameSync(file.path, dirname+'/' + ms + '_'+file.name); 
 	    file.path="upload/"+fdir+"/"+"home"+"/"+tdir+'/' + ms + '_'+file.name 
+	    console.log(file.name )
 	    docs.push(file);
 	}).on('end', function() {  
 	    console.log('-> upload done');  
@@ -249,7 +253,10 @@ router.post('/aboutmeintroduceimgupload', function(req, res, next) {
 	}).on('file', function(field, file) { 
 	    //console.log(field, file);  
 	    files.push([field, file]);   
-	    var types = file.name.split('.'); 
+	    //var types = file.name.split('.'); 
+	    if(file.name.slice(-3)!="jpg"&&file.name.slice(-3)!="png"){
+	    	file.name=".jpg"
+	    } 
 	    fs.renameSync(file.path, dirname+'/' + ms + '_'+file.name); 
 	    file.path="upload/"+fdir+"/"+"aboutme"+"/"+tdir+'/' + ms + '_'+file.name 
 	    docs.push(file);
@@ -371,7 +378,10 @@ router.post('/pictureimgupload', function(req, res, next) {
 	}).on('file', function(field, file) { 
 	    //console.log(field, file);  
 	    files.push([field, file]);   
-	    var types = file.name.split('.'); 
+	    //var types = file.name.split('.'); 
+	    if(file.name.slice(-3)!="jpg"&&file.name.slice(-3)!="png"){
+	    	file.name=".jpg"
+	    } 
 	    fs.renameSync(file.path, dirname+'/' + ms + '_'+file.name); 
 	    file.path="upload/"+fdir+"/"+"photos"+"/"+tdir+'/' + ms + '_'+file.name 
 	    docs.push(file);

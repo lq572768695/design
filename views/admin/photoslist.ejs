@@ -13,10 +13,10 @@
     <div class="box-footer">
       <ul class="mailbox-attachments clearfix">
         <% photoslist.forEach(function(photos){ %>
-          <li  id="loadpicturelist" photosid="<%=photos.id%>">
+          <li  class="loadpicturelist" photosid="<%=photos.id%>" photosname="<%=photos.name%>">
             <span class="mailbox-attachment-icon has-img"><img src="<%=photos.path%>" alt="Attachment"></span>
             <div class="mailbox-attachment-info">
-              <a href="#" class="mailbox-attachment-name"><i class="fa fa-camera"></i> <%=photos.name%></a>
+              <a href='javascript:void(0)' class="mailbox-attachment-name"><i class="fa fa-camera"></i> <%=photos.name%></a>
               <span class="mailbox-attachment-size"  style="margin-top:5px;">
                 <a href="#" class="btn btn-default btn-xs pull-right"><%=photos.num%></a>
               </span>
